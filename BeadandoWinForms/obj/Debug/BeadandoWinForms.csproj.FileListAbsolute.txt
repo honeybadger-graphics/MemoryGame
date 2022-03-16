@@ -1,0 +1,9 @@
+C:\Users\User\source\repos\BeadandoWinForms\bin\Debug\BeadandoWinForms.exe.config
+C:\Users\User\source\repos\BeadandoWinForms\bin\Debug\BeadandoWinForms.exe
+C:\Users\User\source\repos\BeadandoWinForms\bin\Debug\BeadandoWinForms.pdb
+C:\Users\User\source\repos\BeadandoWinForms\obj\Debug\BeadandoWinForms.csprojAssemblyReference.cache
+C:\Users\User\source\repos\BeadandoWinForms\obj\Debug\BeadandoWinForms.Form1.resources
+C:\Users\User\source\repos\BeadandoWinForms\obj\Debug\BeadandoWinForms.Properties.Resources.resources
+C:\Users\User\source\repos\BeadandoWinForms\obj\Debug\BeadandoWinForms.csproj.GenerateResource.cache
+C:\Users\User\source\repos\BeadandoWinForms\obj\Debug\BeadandoWinForms.exe
+C:\Users\User\source\repos\BeadandoWinForms\obj\Debug\BeadandoWinForms.pdb
