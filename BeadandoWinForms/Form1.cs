@@ -13,7 +13,7 @@ namespace BeadandoWinForms
 {
     public partial class Form1 : Form
     {
-        static System.Windows.Forms.Timer patternRevealTimer = new System.Windows.Forms.Timer();
+        static System.Windows.Forms.Timer patternRevealTimer = new System.Windows.Forms.Timer(); 
         private string indexer = "0";
         private string color;
         private List<int> pattern = new List<int>();
@@ -24,12 +24,13 @@ namespace BeadandoWinForms
         private int totalBadGuess = 0;
         private const string endGame = "Game Over!";
         private const string playerConceded = "You gave up.\n Want a new game?";
-        private const string playerReachedErrorLimit = "Number of bad guesses has been reached.";
+        private const string playerReachedErrorLimit = "Number of bad guesses has been reached. \n Want a new game?";
         private const string playerWon = "You managed to memorize the pattern. Good Job!\n Do you want to go harder?";
-        private int[] timeToMemorize = { 10, 15 };//, 20, 18, 16 };
-        private int[] numberofPBToReveal = { 2, 3, 4, 5, 6 }; // 10, 18, 25, 32, 41
-        private int[] numbOfBadGuessOnDiff = { 4, 4, 3, 3, 2 };
+        private readonly int[] timeToMemorize = { 15, 20, 25, 23, 21 };
+        private readonly int[] numberofPBToReveal = { 5, 6, 7, 9, 12 }; // 10, 18, 25, 32, 41
+        private readonly int[] numbOfBadGuessOnDiff = { 4, 4, 3, 3, 2 };
         private DialogResult result;
+        private bool easterEggLoop = false;
         public Form1()
         {
             InitializeComponent();
@@ -50,7 +51,6 @@ namespace BeadandoWinForms
                     index++;
                 }
             } while (index < numberofPB);
-            //pattern.Sort();
         }
 
         private void ShowPatternForPlayer()
@@ -94,6 +94,7 @@ namespace BeadandoWinForms
                     {
                         PictureBox pictureBox = control as PictureBox;
                         pictureBox.Enabled = false;
+                        pictureBox.Cursor = System.Windows.Forms.Cursors.Default;
                     }
                 }
             }
@@ -132,6 +133,7 @@ namespace BeadandoWinForms
                         {
                             pictureBox.BackColor = Color.FromName(color);
                             pictureBox.Enabled = true;
+                            pictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
                         }
                         else if (color.Equals("Green") || color.Equals("Red"))
                         {
@@ -156,6 +158,11 @@ namespace BeadandoWinForms
                 indexer = "pb_Hard2_" + i.ToString();
                 ChangeColorOfPB(indexer, color);
             }
+            lbl_diff.Text = (difficulty + 1).ToString();
+            lbl_Error.Text = "0";
+            lbl_Errors.Text = "/"+(numbOfBadGuessOnDiff[difficulty]).ToString();
+            lbl_playerFound.Text = "0";
+            lbl_patternCount.Text = "/" + (numberofPBToReveal[difficulty]).ToString();
             GeneratePattern(numberofPBToReveal[difficulty]);
             ShowPatternForPlayer();
             btn_start.Enabled = false;
@@ -170,6 +177,7 @@ namespace BeadandoWinForms
             {
                 color = "Green";
                 playerGuessRight++;
+                lbl_playerFound.Text = playerGuessRight.ToString();
             }
             else
             {
@@ -178,8 +186,8 @@ namespace BeadandoWinForms
                 totalBadGuess++;
             }
             ChangeColorOfPB(indexer,color);
-            lbl_Erros.Text = numberOfErrors.ToString();
-            if (numberOfErrors >= numbOfBadGuessOnDiff[difficulty])
+            lbl_Error.Text = numberOfErrors.ToString();
+            if (numberOfErrors > numbOfBadGuessOnDiff[difficulty])
             {
                 DisablePBClick();
                result = MessageBox.Show(playerReachedErrorLimit, endGame, MessageBoxButtons.YesNo);
@@ -203,23 +211,20 @@ namespace BeadandoWinForms
                 this.Close();
                 
             }
-            else
-            {
-                if (pattern.Count == playerGuessRight)
-                {
-                    result = MessageBox.Show(playerWon, endGame, MessageBoxButtons.YesNo);
-                    if (result == System.Windows.Forms.DialogResult.Yes)
-                    {
-                        difficulty++;
-                        DisablePBClick();
-                        newGame();
-                    }
-                    else
-                    {
-                        this.Close();
-                    }
-                }
 
+            if (pattern.Count == playerGuessRight && pattern.Count == numberofPBToReveal[difficulty])
+            {
+                result = MessageBox.Show(playerWon, endGame, MessageBoxButtons.YesNo);
+                if (result == System.Windows.Forms.DialogResult.Yes)
+                {
+                    difficulty++;
+                    DisablePBClick();
+                    newGame();
+                }
+                else
+                {
+                    this.Close();
+                }
             }
         }
 
@@ -237,5 +242,18 @@ namespace BeadandoWinForms
             else { this.Close(); }
         }
 
+        private void pb_easterEgg_Click(object sender, EventArgs e)
+        {
+            if (easterEggLoop)
+            {
+                MessageBox.Show("You found a Easter Egg! \n Too bad you stuck in a loop!", "Easter Egg");
+                pb_easterEgg_Click(sender, e);
+            }
+            else 
+            {
+                MessageBox.Show("You found a Easter Egg!", "Easter Egg");
+            }
+
+        }
     }
 }
