@@ -1,42 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
-using System.Threading;
 
 namespace BeadandoWinForms
 {
     public partial class Form1 : Form
     {
-        static System.Windows.Forms.Timer patternRevealTimer = new System.Windows.Forms.Timer(); 
-        private string indexer = "0";
-        private string color;
-        private List<int> pattern = new List<int>();
-        private int playerGuessRight = 0;
-        private int numberOfErrors = 0;
-        private int timeToReveal = 0;
-        private int difficulty = 0;
-        private int totalBadGuess = 0;
+        static System.Windows.Forms.Timer patternRevealTimer = new System.Windows.Forms.Timer();
+        private string pb_name = "0";  // Variable for PictureBox name  
+        private string color;          // Name of a color
+        private List<int> Pattern = new List<int>(); // List to store PB for player to find
+        private int playerGuessRight = 0; // Counter for found PBs
+        private int numberOfErrors = 0; // Counter for errors
+        private int timeToReveal = 0; // Counter for revealed time
+        private int difficulty = 0; // Difficulty counter
+        private int totalBadGuess = 0; // Player's total number of bad guesses
         private const string endGame = "Game Over!";
         private const string playerConceded = "You gave up.\n Want a new game?";
         private const string playerReachedErrorLimit = "Number of bad guesses has been reached. \n Want a new game?";
         private const string playerWon = "You managed to memorize the pattern. Good Job!\n Do you want to go harder?";
-        private readonly int[] timeToMemorize = { 15, 20, 25, 23, 21 };
-        private readonly int[] numberofPBToReveal = { 5, 6, 7, 9, 12 }; // 10, 18, 25, 32, 41
-        private readonly int[] numbOfBadGuessOnDiff = { 4, 4, 3, 3, 2 };
+        private readonly int[] timeToMemorize = { 15, 20, 25, 23, 21 }; // Time to be revealed for the difficulty
+        private readonly int[] numberofPBToReveal = { 5, 6, 7, 9, 12 }; // Numbers to generate at certain difficulty
+        private readonly int[] numbOfBadGuessOnDiff = { 4, 4, 3, 3, 2 }; // Number of errors at certain difficulty
         private DialogResult result;
-        private bool easterEggLoop = false;
+
         public Form1()
         {
             InitializeComponent();
-            
+
         }
         #region GameLogic
+        /// <summary>
+        /// Generates a random pattern for the player to be memorized.
+        /// </summary>
+        /// <param name="numberofPB">How many things the player find. </param>
         private void GeneratePattern(int numberofPB)
         {
             int index = 0;
@@ -45,80 +44,92 @@ namespace BeadandoWinForms
             do
             {
                 randNumb = rnd.Next(1, 82);
-                if (!pattern.Contains(randNumb))
+                if (!Pattern.Contains(randNumb))
                 {
-                    pattern.Add(randNumb);
+                    Pattern.Add(randNumb);
                     index++;
                 }
             } while (index < numberofPB);
         }
 
+        /// <summary>
+        /// Shows the pattern for the player.
+        /// </summary>
         private void ShowPatternForPlayer()
         {
+            
             patternRevealTimer.Interval = 1000;
             patternRevealTimer.Start();
             timeToReveal = timeToMemorize[difficulty];
-            patternRevealTimer.Tick += patternRevealTimer_Tick;
-            foreach (int index in pattern)
+            patternRevealTimer.Tick += PatternRevealTimer_Tick;
+            lbl_Time.Show();
+            foreach (int index in Pattern)
             {
-                indexer = "pb_Hard2_" + index.ToString();
+                pb_name = "pb_Hard2_" + index.ToString();
                 color = "LawnGreen";
-                ChangeColorOfPB(indexer, color);
+                ChangeColorOfPB(pb_name, color);
             }
-            
+
         }
-        private void patternRevealTimer_Tick(object sender, EventArgs e)
+        /// <summary>
+        /// Decreases the time for the player to memorize the pattern.
+        /// If the time reaches zero it hides the pattern and enables the PBs.
+        /// </summary>
+        private void PatternRevealTimer_Tick(object sender, EventArgs e)
         {
-            lbl_Time.Text = timeToReveal.ToString();
             if (timeToReveal <= 0)
             {
                 patternRevealTimer.Stop();
                 color = "Silver";
                 for (int i = 1; i <= 81; i++)
                 {
-                    indexer = "pb_Hard2_" + i.ToString();
-                    ChangeColorOfPB(indexer, color);
-                    lbl_Time.Hide();
+                    pb_name = "pb_Hard2_" + i.ToString();
+                    ChangeColorOfPB(pb_name, color);
                 }
+                pnl_game_hard_9x9.Enabled = true;
+                lbl_Time.Hide();
             }
+            lbl_Time.Text = timeToReveal.ToString();
             timeToReveal--;
         }
+        /// <summary>
+        /// Shows the last pattern to the player. Prevents unwandted clicks.
+        /// </summary>
         private void DisablePBClick()
         {
-            for (int i = 1; i <= 81; i++)
+            foreach (int index in Pattern)
             {
-                Control[] controls = this.Controls.Find("pb_Hard2_" + i.ToString(), true);
-                foreach (Control control in controls)
-                {
-                    if (control.GetType() == typeof(PictureBox))
-                    {
-                        PictureBox pictureBox = control as PictureBox;
-                        pictureBox.Enabled = false;
-                        pictureBox.Cursor = System.Windows.Forms.Cursors.Default;
-                    }
-                }
-            }
-            foreach (int index in pattern)
-            {
-                indexer = "pb_Hard2_" + index.ToString();
+                pb_name = "pb_Hard2_" + index.ToString();
                 color = "LawnGreen";
-                ChangeColorOfPB(indexer, color);
+                ChangeColorOfPB(pb_name, color);
             }
+            pnl_game_hard_9x9.Enabled = false;
+            
         }
-        private void newGame() 
+        /// <summary>
+        /// Set up for a new game or higher difficulty.
+        /// </summary>
+        private void NewGame()
         {
             btn_start.Enabled = true;
             btn_concede.Enabled = false;
-            lbl_Time.Show();
-            playerGuessRight = 0;
-            numberOfErrors = 0;
-            patternRevealTimer.Tick -= patternRevealTimer_Tick;
-            pattern.Clear();
+            color = "silver";
+            for(int i = 1; i<=81; i++)
+            {
+                pb_name = "pb_Hard2_" + i.ToString();
+                ChangeColorOfPB(pb_name, color);
+            }
         }
 
         #endregion
 
         #region ColorChanger
+        /// <summary>
+        /// If a box is clicked it changes its color. If in game it changes according to the pattern. 
+        /// If its correct then green if not then red then changes the right counters.
+        /// </summary>
+        /// <param name="pb_Index"> Name of the box that should change. </param>
+        /// <param name="color"> Background color of the box to be changed into. </param>
         private void ChangeColorOfPB(string pb_Index, string color)
         {
             Control[] controls = this.Controls.Find(pb_Index, true);
@@ -150,17 +161,19 @@ namespace BeadandoWinForms
         }
         #endregion
 
-        private void btn_start_Click(object sender, EventArgs e)
+        /// <summary>
+        ///  Resets certain counters and the pattern then starts the game.
+        /// </summary>
+        private void BTN_start_Click(object sender, EventArgs e)
         {
-            color = "silver";
-            for (int i = 1; i <= 81; i++)
-            {
-                indexer = "pb_Hard2_" + i.ToString();
-                ChangeColorOfPB(indexer, color);
-            }
+            Pattern.Clear();
+            playerGuessRight = 0;
+            numberOfErrors = 0;
+            timeToReveal = 0;
+            patternRevealTimer.Tick -= PatternRevealTimer_Tick;
             lbl_diff.Text = (difficulty + 1).ToString();
             lbl_Error.Text = "0";
-            lbl_Errors.Text = "/"+(numbOfBadGuessOnDiff[difficulty]).ToString();
+            lbl_Errors.Text = "/" + (numbOfBadGuessOnDiff[difficulty]).ToString();
             lbl_playerFound.Text = "0";
             lbl_patternCount.Text = "/" + (numberofPBToReveal[difficulty]).ToString();
             GeneratePattern(numberofPBToReveal[difficulty]);
@@ -169,33 +182,37 @@ namespace BeadandoWinForms
             btn_concede.Enabled = true;
         }
 
-        private void pb_Click(object sender, EventArgs e)
-        {
-            int tag =Convert.ToInt32(((PictureBox)sender).Tag);
-            indexer = "pb_Hard2_" + tag.ToString();
-            if (pattern.Contains(tag)) 
+        /// <summary>
+        /// Things to do if a certain PB was clicked. Manages Win/Lose condition.
+        /// </summary>
+        private void PB_Click(object sender, EventArgs e)
+        { 
+            int tag = Convert.ToInt32(((PictureBox)sender).Tag);
+            pb_name = "pb_Hard2_" + tag.ToString();
+            if (Pattern.Contains(tag))  //If its right
             {
                 color = "Green";
                 playerGuessRight++;
                 lbl_playerFound.Text = playerGuessRight.ToString();
             }
-            else
+            else    //If its wrong
             {
                 color = "Red";
                 numberOfErrors++;
                 totalBadGuess++;
             }
-            ChangeColorOfPB(indexer,color);
+            ChangeColorOfPB(pb_name, color);
             lbl_Error.Text = numberOfErrors.ToString();
-            if (numberOfErrors > numbOfBadGuessOnDiff[difficulty])
+            if (numberOfErrors > numbOfBadGuessOnDiff[difficulty]) // Number of errors met
             {
                 DisablePBClick();
-               result = MessageBox.Show(playerReachedErrorLimit, endGame, MessageBoxButtons.YesNo);
-                if(result == System.Windows.Forms.DialogResult.Yes) 
+                result = MessageBox.Show(playerReachedErrorLimit, endGame, MessageBoxButtons.YesNo);
+                if (result == System.Windows.Forms.DialogResult.Yes)
                 {
+                    totalBadGuess = 0;
                     difficulty = 0;
-                    DisablePBClick();
-                    newGame();
+                    NewGame();
+                    WriteToFile("Failed", totalBadGuess, difficulty);
                 }
                 else
                 {
@@ -203,57 +220,70 @@ namespace BeadandoWinForms
                 }
             }
 
-            if (difficulty == timeToMemorize.Length-1 && pattern.Count == playerGuessRight)
-            {
-                string gameFinished = "WOW. You managed to complete all patterns.\n " +
-                    "Total number of bad guesses: " + totalBadGuess;
-                MessageBox.Show(gameFinished, endGame);
-                this.Close();
-                
-            }
-
-            if (pattern.Count == playerGuessRight && pattern.Count == numberofPBToReveal[difficulty])
+            if (numberofPBToReveal[difficulty] == playerGuessRight ) // Difficulty completed and player won.
             {
                 result = MessageBox.Show(playerWon, endGame, MessageBoxButtons.YesNo);
                 if (result == System.Windows.Forms.DialogResult.Yes)
                 {
                     difficulty++;
                     DisablePBClick();
-                    newGame();
+                    NewGame();
                 }
                 else
                 {
+                    WriteToFile("Won", totalBadGuess, difficulty);
                     this.Close();
                 }
+            }
+
+            if (difficulty == timeToMemorize.Length - 1 && Pattern.Count == playerGuessRight) //Player completed the game
+            {
+                string gameFinished = "WOW. You managed to complete all patterns.\n " +
+                    "Total number of bad guesses: " + totalBadGuess;
+                MessageBox.Show(gameFinished, endGame);
+                WriteToFile("Completed", totalBadGuess, difficulty);
+                this.Close();
+
             }
         }
 
 
-        private void btn_concede_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Player Concedes the game.
+        /// </summary>
+        private void BTN_concede_Click(object sender, EventArgs e)
         {
             DisablePBClick();
-           result = MessageBox.Show(playerConceded,endGame, MessageBoxButtons.YesNo);
+            lbl_Time.Hide();
+            WriteToFile("Conceded", totalBadGuess, difficulty);
+            result = MessageBox.Show(playerConceded, endGame, MessageBoxButtons.YesNo);
             if (result == System.Windows.Forms.DialogResult.Yes)
             {
                 difficulty = 0;
-                DisablePBClick();
-                newGame();
+                totalBadGuess = 0;
+                NewGame();
             }
             else { this.Close(); }
         }
 
-        private void pb_easterEgg_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Easter Egg!
+        /// </summary>
+        private void PB_easterEgg_Click(object sender, EventArgs e)
         {
-            if (easterEggLoop)
+           MessageBox.Show("You found a Easter Egg!", "Easter Egg");
+            System.Diagnostics.Process.Start("https://youtu.be/dQw4w9WgXcQ");
+        }
+        private void WriteToFile(string cond, int errors, int diff) 
+        {
+            
+            string date = DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss");
+            string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "GameLog.txt"), true))
             {
-                MessageBox.Show("You found a Easter Egg! \n Too bad you stuck in a loop!", "Easter Egg");
-                pb_easterEgg_Click(sender, e);
+                outputFile.WriteLine("Date: {0} \t Difficulty: {1} \t Condtion: {2} \t TotalErrors: {3}", date, diff+1, cond, errors);
             }
-            else 
-            {
-                MessageBox.Show("You found a Easter Egg!", "Easter Egg");
-            }
-
+        
         }
     }
 }
