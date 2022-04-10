@@ -21,7 +21,7 @@ namespace BeadandoWinForms
         private const string playerConceded = "You gave up.\n Want a new game?";
         private const string playerReachedErrorLimit = "Number of bad guesses has been reached. \n Want a new game?";
         private const string playerWon = "You managed to memorize the pattern. Good Job!\n Do you want to go harder?";
-        private readonly int[] timeToMemorize = { 15, 20, 25, 23, 21 }; // Time to be revealed for the difficulty
+        private readonly int[] timeToMemorize = { 15, 20, 25, 23, 22 }; // Time to be revealed for the difficulty
         private readonly int[] numberofPBToReveal = { 5, 6, 7, 9, 12 }; // Numbers to generate at certain difficulty
         private readonly int[] numbOfBadGuessOnDiff = { 4, 4, 3, 3, 2 }; // Number of errors at certain difficulty
         private DialogResult result;
@@ -220,7 +220,7 @@ namespace BeadandoWinForms
                 }
             }
 
-            if (numberofPBToReveal[difficulty] == playerGuessRight ) // Difficulty completed and player won.
+            if (numberofPBToReveal[difficulty] == playerGuessRight && difficulty != numberofPBToReveal.Length - 1) // Difficulty completed and player won.
             {
                 result = MessageBox.Show(playerWon, endGame, MessageBoxButtons.YesNo);
                 if (result == System.Windows.Forms.DialogResult.Yes)
@@ -236,7 +236,7 @@ namespace BeadandoWinForms
                 }
             }
 
-            if (difficulty == timeToMemorize.Length - 1 && Pattern.Count == playerGuessRight) //Player completed the game
+            if (numberofPBToReveal[difficulty] == playerGuessRight) //Player completed the game
             {
                 string gameFinished = "WOW. You managed to complete all patterns.\n " +
                     "Total number of bad guesses: " + totalBadGuess;

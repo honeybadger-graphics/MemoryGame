@@ -1718,7 +1718,7 @@
             // 
             this.lbl_patternCount.AutoSize = true;
             this.lbl_patternCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lbl_patternCount.Location = new System.Drawing.Point(95, 109);
+            this.lbl_patternCount.Location = new System.Drawing.Point(112, 109);
             this.lbl_patternCount.Name = "lbl_patternCount";
             this.lbl_patternCount.Size = new System.Drawing.Size(0, 16);
             this.lbl_patternCount.TabIndex = 31;
