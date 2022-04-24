@@ -209,13 +209,15 @@ namespace BeadandoWinForms
                 result = MessageBox.Show(playerReachedErrorLimit, endGame, MessageBoxButtons.YesNo);
                 if (result == System.Windows.Forms.DialogResult.Yes)
                 {
+                    WriteToFile("Failed", totalBadGuess, difficulty);
                     totalBadGuess = 0;
                     difficulty = 0;
                     NewGame();
-                    WriteToFile("Failed", totalBadGuess, difficulty);
+                    
                 }
                 else
                 {
+                    WriteToFile("Failed", totalBadGuess, difficulty);
                     this.Close();
                 }
             }
@@ -231,7 +233,7 @@ namespace BeadandoWinForms
                 }
                 else
                 {
-                    WriteToFile("Won", totalBadGuess, difficulty);
+                    WriteToFile("Level Completed", totalBadGuess, difficulty);
                     this.Close();
                 }
             }
@@ -241,7 +243,7 @@ namespace BeadandoWinForms
                 string gameFinished = "WOW. You managed to complete all patterns.\n " +
                     "Total number of bad guesses: " + totalBadGuess;
                 MessageBox.Show(gameFinished, endGame);
-                WriteToFile("Completed", totalBadGuess, difficulty);
+                WriteToFile("Game Completed", totalBadGuess, difficulty);
                 this.Close();
 
             }
@@ -267,13 +269,32 @@ namespace BeadandoWinForms
         }
 
         /// <summary>
-        /// Easter Egg!
+        /// Easter Egg (randomly selected things to chose from)!
         /// </summary>
         private void PB_easterEgg_Click(object sender, EventArgs e)
         {
-           MessageBox.Show("You found a Easter Egg!", "Easter Egg");
-            System.Diagnostics.Process.Start("https://youtu.be/dQw4w9WgXcQ");
+            Random rnd = new Random();
+            double randomEasterEgg = rnd.NextDouble();
+            MessageBox.Show("You found a Easter Egg!", "Easter Egg");
+            if (randomEasterEgg <= 0.33) 
+            {
+                System.Diagnostics.Process.Start("https://this-person-does-not-exist.com/en");
+            }
+            else if (0.33<randomEasterEgg && randomEasterEgg <= 0.66)
+            {
+                System.Diagnostics.Process.Start("https://hackertyper.net/");
+            }
+            else
+            {
+                System.Diagnostics.Process.Start("https://youtu.be/dQw4w9WgXcQ");
+            }
         }
+        /// <summary>
+        /// Writes Game logs to file, can be used to track played games and other things.
+        /// </summary>
+        /// <param name="cond"> Condition of how the game ended (win, lose, give up, completed).</param> 
+        /// <param name="errors"> Number of total errors when the game ended</param>
+        /// <param name="diff"> Difficulty of the game when ended.</param>
         private void WriteToFile(string cond, int errors, int diff) 
         {
             
@@ -281,7 +302,7 @@ namespace BeadandoWinForms
             string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "GameLog.txt"), true))
             {
-                outputFile.WriteLine("Date: {0} \t Difficulty: {1} \t Condtion: {2} \t TotalErrors: {3}", date, diff+1, cond, errors);
+                outputFile.WriteLine("Date: {0} \t Difficulty: {1} \t Condition: {2} \t TotalErrors: {3}", date, diff+1, cond, errors);
             }
         
         }

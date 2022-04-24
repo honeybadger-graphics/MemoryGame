@@ -16,4 +16,3 @@ C:\Users\User\Documents\GitHub\MemoryGame\BeadandoWinForms\obj\Debug\BeadandoWin
 C:\Users\User\Documents\GitHub\MemoryGame\BeadandoWinForms\obj\Debug\BeadandoWinForms.exe
 C:\Users\User\Documents\GitHub\MemoryGame\BeadandoWinForms\obj\Debug\BeadandoWinForms.pdb
 C:\Users\User\Documents\GitHub\MemoryGame\BeadandoWinForms\obj\Debug\BeadandoWinForms.csprojAssemblyReference.cache
-C:\Users\User\Documents\GitHub\MemoryGame\BeadandoWinForms\obj\Debug\BeadandoWinForms.csproj.CoreCompileInputs.cache
