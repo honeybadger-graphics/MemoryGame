@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace BeadandoWinForms
@@ -25,6 +27,8 @@ namespace BeadandoWinForms
         private readonly int[] numberofPBToReveal = { 5, 6, 7, 9, 12 }; // Numbers to generate at certain difficulty
         private readonly int[] numbOfBadGuessOnDiff = { 4, 4, 3, 3, 2 }; // Number of errors at certain difficulty
         private DialogResult result;
+        private const string fileName = "GameLog.txt";
+        private string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/" + fileName;
 
         public Form1()
         {
@@ -206,7 +210,7 @@ namespace BeadandoWinForms
             if (numberOfErrors > numbOfBadGuessOnDiff[difficulty]) // Number of errors met
             {
                 DisablePBClick();
-                result = MessageBox.Show(playerReachedErrorLimit, endGame, MessageBoxButtons.YesNo);
+                result = MessageBox.Show(playerReachedErrorLimit, endGame, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result == System.Windows.Forms.DialogResult.Yes)
                 {
                     WriteToFile("Failed", totalBadGuess, difficulty);
@@ -224,7 +228,7 @@ namespace BeadandoWinForms
 
             if (numberofPBToReveal[difficulty] == playerGuessRight && difficulty != numberofPBToReveal.Length - 1) // Difficulty completed and player won.
             {
-                result = MessageBox.Show(playerWon, endGame, MessageBoxButtons.YesNo);
+                result = MessageBox.Show(playerWon, endGame, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == System.Windows.Forms.DialogResult.Yes)
                 {
                     difficulty++;
@@ -242,7 +246,7 @@ namespace BeadandoWinForms
             {
                 string gameFinished = "WOW. You managed to complete all patterns.\n " +
                     "Total number of bad guesses: " + totalBadGuess;
-                MessageBox.Show(gameFinished, endGame);
+                MessageBox.Show(gameFinished, endGame, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 WriteToFile("Game Completed", totalBadGuess, difficulty);
                 this.Close();
 
@@ -258,7 +262,7 @@ namespace BeadandoWinForms
             DisablePBClick();
             lbl_Time.Hide();
             WriteToFile("Conceded", totalBadGuess, difficulty);
-            result = MessageBox.Show(playerConceded, endGame, MessageBoxButtons.YesNo);
+            result = MessageBox.Show(playerConceded, endGame, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == System.Windows.Forms.DialogResult.Yes)
             {
                 difficulty = 0;
@@ -275,7 +279,7 @@ namespace BeadandoWinForms
         {
             Random rnd = new Random();
             double randomEasterEgg = rnd.NextDouble();
-            MessageBox.Show("You found a Easter Egg!", "Easter Egg");
+            MessageBox.Show("You found a Easter Egg!", "Easter Egg",MessageBoxButtons.OK, MessageBoxIcon.Hand);
             if (randomEasterEgg <= 0.33) 
             {
                 System.Diagnostics.Process.Start("https://this-person-does-not-exist.com/en");
@@ -297,14 +301,77 @@ namespace BeadandoWinForms
         /// <param name="diff"> Difficulty of the game when ended.</param>
         private void WriteToFile(string cond, int errors, int diff) 
         {
-            
             string date = DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss");
-            string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "GameLog.txt"), true))
+            if (!File.Exists(docPath))
             {
-                outputFile.WriteLine("Date: {0} \t Difficulty: {1} \t Condition: {2} \t TotalErrors: {3}", date, diff+1, cond, errors);
+                using (StreamWriter outputFile = File.CreateText(docPath))
+                {
+                    outputFile.WriteLine("//This is a automaticly generated file to store data, but they are not required and can be modified (please don't). \n" +
+                        "//You can keep track of the games you played here. \n//Data stored in orded: systemtime when you played, difficulty of the game that you played, how it ended," +
+                        " and the number of errors you had from the start of the game to a new one. ");
+                    outputFile.WriteLine("Date: {0} \t Difficulty: {1} \t Condition: {2} \t TotalErrors: {3}", date, diff + 1, cond, errors);
+                }
             }
-        
+            else 
+            { 
+                using (StreamWriter outputFile = File.AppendText(docPath))
+                {
+                    outputFile.WriteLine("Date: {0} \t Difficulty: {1} \t Condition: {2} \t TotalErrors: {3}", date, diff + 1, cond, errors);
+                }
+    
+            }
+
+        }
+
+        /// <summary>
+        /// Override of the OnFormClosing to check if the player clicked the CloseWindowButton or the form closing itself.
+        /// Ask the user if he wants to see the results of the game.
+        /// </summary>
+        /// <param name="e">Event for closing the form</param>
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (new StackTrace().GetFrames().Any(x=>x.GetMethod().Name == "Close"))
+            {
+                result = MessageBox.Show("User is done with the game. \n" +
+                    "Game data can be found at Documents/GameLog.txt\n" +
+                    "Do you want to open it?", "Game Closing",MessageBoxButtons.YesNo,MessageBoxIcon.Information);
+                if (result == System.Windows.Forms.DialogResult.Yes)
+                {
+                    Process.Start(docPath);
+                }
+            }
+            else
+            {
+                if (totalBadGuess != 0 ) 
+                {
+                    WriteToFile("Game Closed", totalBadGuess, difficulty);
+                }
+               result = MessageBox.Show("User is closing the window. \n" +
+                   "Game data can be found at Documents/GameLog.txt \n" +
+                   "Do you want to open it?","Game Closing",MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                if (result == System.Windows.Forms.DialogResult.Yes)
+                {
+                    Process.Start(docPath);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Button for user to see games played. If the file doesn't exist then shows an error.
+        /// If the file exists then opens it for the player.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btn_History_Click(object sender, EventArgs e)
+        {
+            if (File.Exists(docPath))
+            {
+                Process.Start(docPath);
+            }
+            else
+            {
+                MessageBox.Show("There is no history of played games on this computer.\nMaybe play some then come back.", "No Data to be shown.", MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
         }
     }
 }

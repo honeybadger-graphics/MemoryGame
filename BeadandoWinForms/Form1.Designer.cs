@@ -141,6 +141,7 @@
             this.lbl_patternCount = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
             this.lbl_playerFound = new System.Windows.Forms.Label();
+            this.btn_History = new System.Windows.Forms.Button();
             this.pnl_game_hard_9x9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb_Hard2_81)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_Hard2_80)).BeginInit();
@@ -1742,11 +1743,23 @@
             this.lbl_playerFound.Size = new System.Drawing.Size(0, 16);
             this.lbl_playerFound.TabIndex = 29;
             // 
+            // btn_History
+            // 
+            this.btn_History.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btn_History.Location = new System.Drawing.Point(12, 256);
+            this.btn_History.Name = "btn_History";
+            this.btn_History.Size = new System.Drawing.Size(100, 24);
+            this.btn_History.TabIndex = 32;
+            this.btn_History.Text = "Game History";
+            this.btn_History.UseVisualStyleBackColor = true;
+            this.btn_History.Click += new System.EventHandler(this.btn_History_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(554, 375);
+            this.Controls.Add(this.btn_History);
             this.Controls.Add(this.lbl_patternCount);
             this.Controls.Add(this.label23);
             this.Controls.Add(this.lbl_playerFound);
@@ -1779,7 +1792,13 @@
             this.Controls.Add(this.lbl_Time);
             this.Controls.Add(this.pnl_game_hard_9x9);
             this.Controls.Add(this.btn_start);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(570, 414);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(570, 414);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MemoryGame";
             this.pnl_game_hard_9x9.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pb_Hard2_81)).EndInit();
@@ -1984,6 +2003,7 @@
         private System.Windows.Forms.Label lbl_patternCount;
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label lbl_playerFound;
+        private System.Windows.Forms.Button btn_History;
     }
 }
 
