@@ -117,6 +117,7 @@ namespace BeadandoWinForms
         {
             btn_start.Enabled = true;
             btn_concede.Enabled = false;
+            playerGuessRight = 0;
             color = "silver";
             for(int i = 1; i<=81; i++)
             {
@@ -171,7 +172,7 @@ namespace BeadandoWinForms
         private void BTN_start_Click(object sender, EventArgs e)
         {
             Pattern.Clear();
-            playerGuessRight = 0;
+            
             numberOfErrors = 0;
             timeToReveal = 0;
             patternRevealTimer.Tick -= PatternRevealTimer_Tick;
